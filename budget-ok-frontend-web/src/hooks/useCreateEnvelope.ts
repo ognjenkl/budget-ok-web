@@ -1,9 +1,9 @@
 import {useMutation} from "@tanstack/react-query";
 import {message} from "antd";
 import {AxiosError} from "axios";
-import createEnvelope from "../components/CreateEnvelopeForm/createEnvelope";
+import createEnvelope from "../api/createEnvelope.ts";
 
-export default function useCreateEnvelopoe() {
+export default function useCreateEnvelope() {
 
   return useMutation({
     mutationFn: createEnvelope,

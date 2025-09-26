@@ -21,7 +21,7 @@ return <Form<CreateEnvelopeFormData> data-testid="create-envelope-form" layout="
     <InputNumber placeholder="Budget" />
   </Form.Item>
   <Form.Item>
-    <Button type="primary" htmlType="submit" loading={isPending}>
+    <Button type="primary" htmlType="submit" loading={isPending} disabled={isPending}>
       Submit
     </Button>
   </Form.Item>
