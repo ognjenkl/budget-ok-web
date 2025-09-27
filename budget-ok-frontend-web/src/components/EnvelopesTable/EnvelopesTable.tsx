@@ -73,7 +73,7 @@ export default function EnvelopesTable() {
   return (
     <div className="envelopes-container">
       <div className="envelopes-header">
-        <Typography.Title level={4} style={{ margin: 0 }}>Envelopes</Typography.Title>
+        <Typography.Title level={4} className="envelopes-title">Envelopes</Typography.Title>
         <div className="envelopes-actions">
           <Button
             type="primary"

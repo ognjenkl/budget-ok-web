@@ -50,6 +50,10 @@
   padding: 12px 16px;
 }
 
+.envelopes-title {
+  margin: 0 !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .envelopes-header {
