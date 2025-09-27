@@ -1,0 +1,71 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.table {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.nameColumn {
+  width: 60%;
+}
+
+.budgetColumn {
+  width: 30%;
+}
+
+.actionsColumn {
+  width: 10%;
+  text-align: right;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.tableWrapper {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  margin: 0 auto;
+  font-size: 14px; /* Slightly smaller font */
+}
+
+:global(.ant-table-thead > tr > th) {
+  padding: 8px 8px; /* Reduced padding */
+}
+
+:global(.ant-table-tbody > tr > td) {
+  padding: 8px 8px; /* Reduced padding */
+}

@@ -5,11 +5,23 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .app-container {
-  max-width: 600px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
 }
 

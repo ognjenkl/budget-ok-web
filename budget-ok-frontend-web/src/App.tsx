@@ -9,7 +9,7 @@ function AppContent() {
   return (
     <div className="app-container">
       <h1>Budget OK</h1>
-      <div className="card" style={{ marginTop: '24px' }}>
+      <div className="card" style={{ marginTop: '24px', width: '100%' }}>
         <h2>Your Envelopes</h2>
         <EnvelopesTable />
       </div>
