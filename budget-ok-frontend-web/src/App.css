@@ -5,37 +5,42 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding: 2rem;
+  background-color: #f0f2f5;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem 1rem;
   box-sizing: border-box;
 }
 
 #root {
-  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .app-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 h1 {
   color: #1890ff;
   text-align: center;
-  margin-bottom: 2rem;
+  margin: 0 0 2rem 0;
 }
 
-.card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+h2 {
+  margin-top: 0;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
 h2 {

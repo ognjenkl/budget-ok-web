@@ -7,8 +7,9 @@ import deleteEnvelope from '../../api/deleteEnvelope';
 import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import EditEnvelopeForm from '../EditEnvelopeForm/EditEnvelopeForm';
 import CreateEnvelopeForm from '../CreateEnvelopeForm/CreateEnvelopeForm';
+import styles from './EnvelopesTable.module.css';
 
-const {confirm} = Modal;
+const { confirm } = Modal;
 
 const columns = [
   {
@@ -70,49 +71,57 @@ export default function EnvelopesTable() {
   }
 
   return (
-    <>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className={styles.container}>
+      <div className={styles.header}>
         <Typography.Title level={4} style={{ margin: 0 }}>Envelopes</Typography.Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsCreateModalVisible(true)}
-          aria-label="New Envelope"
-        />
+        <div className={styles.actions}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsCreateModalVisible(true)}
+            aria-label="New Envelope"
+          >
+            New Envelope
+          </Button>
+        </div>
       </div>
       
-      <Table
-        columns={[
-          ...columns,
-          {
-            title: 'Actions',
-            key: 'actions',
-            render: (_, record) => (
-              <Space size="middle">
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  onClick={() => setEditingEnvelope(record)}
-                  aria-label="Edit"
-                />
-                <Button
-                  type="text"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(record.id)}
-                  aria-label="Delete"
-                  loading={isDeleting}
-                  disabled={isDeleting}
-                />
-              </Space>
-            ),
-          },
-        ]}
-        dataSource={envelopes}
-        loading={isLoading}
-        rowKey="id"
-        pagination={{ pageSize: 10 }}
-      />
+      <div className={styles.tableWrapper}>
+        <Table
+          columns={[
+            ...columns,
+            {
+              title: 'Actions',
+              key: 'actions',
+              width: 120,
+              render: (_, record) => (
+                <Space size="middle">
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => setEditingEnvelope(record)}
+                    aria-label="Edit"
+                  />
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDelete(record.id)}
+                    aria-label="Delete"
+                    loading={isDeleting}
+                    disabled={isDeleting}
+                  />
+                </Space>
+              ),
+            },
+          ]}
+          dataSource={envelopes}
+          loading={isLoading}
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+          className={styles.table}
+        />
+      </div>
 
       <Modal
         title="Create New Envelope"
@@ -124,6 +133,7 @@ export default function EnvelopesTable() {
         <CreateEnvelopeForm 
           onSuccess={() => {
             setIsCreateModalVisible(false);
+            queryClient.invalidateQueries({ queryKey: ['envelopes'] });
           }}
         />
       </Modal>
@@ -133,7 +143,7 @@ export default function EnvelopesTable() {
         open={!!editingEnvelope}
         onCancel={handleCancelEdit}
         footer={null}
-        destroyOnHidden={false}
+        destroyOnHidden
       >
         {editingEnvelope && (
           <EditEnvelopeForm
@@ -143,6 +153,6 @@ export default function EnvelopesTable() {
           />
         )}
       </Modal>
-    </>
+    </div>
   );
 }
