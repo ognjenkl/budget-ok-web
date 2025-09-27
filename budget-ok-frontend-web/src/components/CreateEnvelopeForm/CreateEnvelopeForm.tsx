@@ -1,4 +1,5 @@
 import { Button, Form, Input, InputNumber, message } from "antd";
+import type { InputRef } from "antd";
 import { useEffect, useRef } from "react";
 import useCreateEnvelope from "../../hooks/useCreateEnvelope";
 
@@ -13,7 +14,7 @@ type CreateEnvelopeFormProps = {
 
 export default function CreateEnvelopeForm({ onSuccess }: CreateEnvelopeFormProps) {
   const [form] = Form.useForm();
-  const nameInputRef = useRef<Input>(null);
+  const nameInputRef = useRef<InputRef>(null);
   const { mutate, isPending } = useCreateEnvelope();
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { Envelope } from '../../api/getEnvelopes';
 import getEnvelopes from '../../api/getEnvelopes';
 import deleteEnvelope from '../../api/deleteEnvelope';
-import { ExclamationCircleOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import EditEnvelopeForm from '../EditEnvelopeForm/EditEnvelopeForm';
 import CreateEnvelopeForm from '../CreateEnvelopeForm/CreateEnvelopeForm';
 
@@ -77,9 +77,8 @@ export default function EnvelopesTable() {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setIsCreateModalVisible(true)}
-        >
-          New Envelope
-        </Button>
+          aria-label="New Envelope"
+        />
       </div>
       
       <Table
@@ -99,7 +98,7 @@ export default function EnvelopesTable() {
                 <Button
                   type="text"
                   danger
-                  icon={<ExclamationCircleOutlined />}
+                  icon={<DeleteOutlined />}
                   onClick={() => handleDelete(record.id)}
                   aria-label="Delete"
                   loading={isDeleting}
