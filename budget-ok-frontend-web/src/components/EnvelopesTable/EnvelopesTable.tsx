@@ -7,7 +7,7 @@ import deleteEnvelope from '../../api/deleteEnvelope';
 import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import EditEnvelopeForm from '../EditEnvelopeForm/EditEnvelopeForm';
 import CreateEnvelopeForm from '../CreateEnvelopeForm/CreateEnvelopeForm';
-import styles from './EnvelopesTable.module.css';
+import './EnvelopesTable.css';
 
 const { confirm } = Modal;
 
@@ -71,10 +71,10 @@ export default function EnvelopesTable() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
+    <div className="envelopes-container">
+      <div className="envelopes-header">
         <Typography.Title level={4} style={{ margin: 0 }}>Envelopes</Typography.Title>
-        <div className={styles.actions}>
+        <div className="envelopes-actions">
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -86,7 +86,7 @@ export default function EnvelopesTable() {
         </div>
       </div>
       
-      <div className={styles.tableWrapper}>
+      <div className="envelopes-table-wrapper">
         <Table
           columns={[
             ...columns,
@@ -119,7 +119,7 @@ export default function EnvelopesTable() {
           loading={isLoading}
           rowKey="id"
           pagination={{ pageSize: 10 }}
-          className={styles.table}
+          className="envelopes-table"
         />
       </div>
 
