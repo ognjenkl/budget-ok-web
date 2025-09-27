@@ -80,9 +80,7 @@ export default function EnvelopesTable() {
             icon={<PlusOutlined />}
             onClick={() => setIsCreateModalVisible(true)}
             aria-label="New Envelope"
-          >
-            New Envelope
-          </Button>
+          />
         </div>
       </div>
       
