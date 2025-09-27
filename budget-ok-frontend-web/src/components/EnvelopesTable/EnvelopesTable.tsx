@@ -1,9 +1,11 @@
-import {Table, Space, Button, Modal, message} from 'antd';
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
-import type {Envelope} from '../../api/getEnvelopes';
+import { Table, Space, Button, Modal, message } from 'antd';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import type { Envelope } from '../../api/getEnvelopes';
 import getEnvelopes from '../../api/getEnvelopes';
 import deleteEnvelope from '../../api/deleteEnvelope';
-import {ExclamationCircleOutlined} from '@ant-design/icons';
+import { ExclamationCircleOutlined, EditOutlined } from '@ant-design/icons';
+import EditEnvelopeForm from '../EditEnvelopeForm/EditEnvelopeForm';
 
 const {confirm} = Modal;
 
@@ -23,6 +25,7 @@ const columns = [
 
 export default function EnvelopesTable() {
   const queryClient = useQueryClient();
+  const [editingEnvelope, setEditingEnvelope] = useState<Envelope | null>(null);
 
   const {data: envelopes = [], isLoading, isError} = useQuery<Envelope[]>({
     queryKey: ['envelopes'],
@@ -39,6 +42,18 @@ export default function EnvelopesTable() {
       message.error('Failed to delete envelope');
     },
   });
+
+  const handleEdit = (envelope: Envelope) => {
+    setEditingEnvelope(envelope);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEnvelope(null);
+  };
+
+  const handleUpdateSuccess = () => {
+    message.success('Envelope updated successfully');
+  };
 
   const handleDelete = (id: string) => {
     confirm({
@@ -58,32 +73,55 @@ export default function EnvelopesTable() {
   }
 
   return (
+    <>
       <Table
-          columns={[
-            ...columns,
-            {
-              title: 'Action',
-              key: 'action',
-              render: (_: any, record: Envelope) => (
-                  <Space size="middle">
-                    <Button type="link" onClick={() => console.log('Edit', record.id)}>Edit</Button>
-                    <Button
-                        type="link"
-                        danger
-                        onClick={() => handleDelete(record.id)}
-                        loading={isDeleting}
-                        disabled={isDeleting}
-                    >
-                      Delete
-                    </Button>
-                  </Space>
-              ),
-            },
-          ]}
-          dataSource={envelopes}
-          loading={isLoading}
-          rowKey="id"
-          pagination={{pageSize: 10}}
+        columns={[
+          ...columns,
+          {
+            title: 'Action',
+            key: 'action',
+            render: (_: any, record: Envelope) => (
+              <Space size="middle">
+                <Button 
+                  type="text" 
+                  icon={<EditOutlined />} 
+                  onClick={() => handleEdit(record)}
+                  title="Edit envelope"
+                />
+                <Button
+                  type="text"
+                  danger
+                  icon={<ExclamationCircleOutlined />}
+                  onClick={() => handleDelete(record.id)}
+                  loading={isDeleting}
+                  disabled={isDeleting}
+                  title="Delete envelope"
+                />
+              </Space>
+            ),
+          },
+        ]}
+        dataSource={envelopes}
+        loading={isLoading}
+        rowKey="id"
+        pagination={{ pageSize: 10 }}
       />
+      
+      <Modal
+        title="Edit Envelope"
+        open={!!editingEnvelope}
+        onCancel={handleCancelEdit}
+        footer={null}
+        destroyOnHidden={false}
+      >
+        {editingEnvelope && (
+          <EditEnvelopeForm
+            envelope={editingEnvelope}
+            onSuccess={handleUpdateSuccess}
+            onCancel={handleCancelEdit}
+          />
+        )}
+      </Modal>
+    </>
   );
 }
