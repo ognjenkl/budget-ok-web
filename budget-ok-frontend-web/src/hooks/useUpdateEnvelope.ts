@@ -20,8 +20,13 @@ export default function useUpdateEnvelope(envelopeId: string) {
       });
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['envelopes'] });
+    onSuccess: (updatedEnvelope) => {
+      // Update the cache directly instead of invalidating
+      queryClient.setQueryData<Envelope[]>(['envelopes'], (oldEnvelopes = []) => {
+        return oldEnvelopes.map(envelope => 
+          envelope.id === updatedEnvelope.id ? updatedEnvelope : envelope
+        );
+      });
     },
   });
 }

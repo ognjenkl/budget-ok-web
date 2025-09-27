@@ -44,11 +44,6 @@ export default function EnvelopesTable() {
       message.error('Failed to delete envelope');
     },
   });
-
-  const handleEdit = (envelope: Envelope) => {
-    setEditingEnvelope(envelope);
-  };
-
   const handleCancelEdit = () => {
     setEditingEnvelope(null);
   };
