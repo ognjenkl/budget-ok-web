@@ -10,7 +10,6 @@ function AppContent() {
     <div className="app-container">
       <h1>Budget OK</h1>
       <div className="card envelopes-card">
-        <h2>Your Envelopes</h2>
         <EnvelopesTable />
       </div>
     </div>
