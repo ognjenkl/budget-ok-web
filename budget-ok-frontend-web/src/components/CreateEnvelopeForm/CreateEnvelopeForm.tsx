@@ -7,13 +7,18 @@ type CreateEnvelopeFormData = {
 }
 
 export default function CreateEnvelopeForm() {
+  const [form] = Form.useForm();
   const {mutate, isPending} = useCreateEnvelope()
 
   const onFinish = (values: CreateEnvelopeFormData) => {
-    mutate(values)
+    mutate(values, {
+      onSuccess: () => {
+        form.resetFields();
+      }
+    });
   }
 
-return <Form<CreateEnvelopeFormData> data-testid="create-envelope-form" layout="vertical" onFinish={onFinish}>
+return <Form<CreateEnvelopeFormData> data-testid="create-envelope-form" layout="vertical" form={form} onFinish={onFinish}>
   <Form.Item name="name" label="Envelope Name" rules={[{required: true}]}>
     <Input placeholder="Envelope Name" />
   </Form.Item>
