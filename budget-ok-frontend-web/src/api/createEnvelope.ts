@@ -1,6 +1,6 @@
-import buildApiPrefix from "./buildApiPrefix.ts";
-import type CreateEnvelopeDto from "./create.envelope.dto.ts";
-import type CreateEnvelopeResponse from "./create.envelope.response.ts";
+import buildApiPrefix from "./buildApiPrefix";
+import type {CreateEnvelopeDto} from "./create.envelope.dto";
+import type {CreateEnvelopeResponse} from "./create.envelope.response";
 import axios from "axios";
 
 const apiPrefix = buildApiPrefix();
