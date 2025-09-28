@@ -33,9 +33,9 @@ export default function EnvelopesTable() {
   const [viewingExpensesForEnvelope, setViewingExpensesForEnvelope] = useState<Envelope | null>(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
-  const {data: envelopes = [], isLoading, isError} = useQuery<Envelope[]>({
+  const {data: envelopes = [], isLoading, isError} = useQuery({
     queryKey: ['envelopes'],
-    queryFn: getEnvelopes,
+    queryFn: () => getEnvelopes(),
   });
 
   const {mutate: deleteEnvelopeMutation, isPending: isDeleting} = useMutation({
@@ -139,8 +139,7 @@ export default function EnvelopesTable() {
 
       {viewingExpensesForEnvelope && (
         <Expenses
-          envelopeId={viewingExpensesForEnvelope.id}
-          envelopeName={viewingExpensesForEnvelope.name}
+          envelope={viewingExpensesForEnvelope}
           onClose={() => setViewingExpensesForEnvelope(null)}
         />
       )}

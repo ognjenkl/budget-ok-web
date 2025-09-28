@@ -1,24 +1,23 @@
 import { Table, Modal, Button, Space, Typography, Form, Input, InputNumber, message, Radio, Tooltip } from 'antd';
 import './Expenses.css';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import type { TransactionType } from '../../api/expense';
-import type { Expense as ExpenseType, CreateExpenseDto } from '../../api/expense';
-import { getExpensesByEnvelopeId, createExpense } from '../../api/expense';
+import type { TransactionType, Expense as ExpenseType, CreateExpenseDto, Envelope } from '../../api/getEnvelopes';
+// Expense creation is now handled by the Envelope class
 
 const { Title, Text } = Typography;
 
 interface ExpensesProps {
-  envelopeId: string;
-  envelopeName: string;
+  envelope: Envelope;
   onClose: () => void;
 }
 
-export default function Expenses({ envelopeId, envelopeName, onClose }: ExpensesProps) {
+export default function Expenses({ envelope, onClose }: ExpensesProps) {
   const [form] = Form.useForm<{ amount: number; memo: string; description?: string; transactionType: TransactionType }>();
   const [isAddExpenseModalVisible, setIsAddExpenseModalVisible] = useState(false);
   const amountInputRef = useRef<any>(null);
+  const queryClient = useQueryClient();
   
   // Set default form values
   useEffect(() => {
@@ -26,20 +25,29 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
       transactionType: 'WITHDRAW' as TransactionType
     });
   }, [form]);
-  const queryClient = useQueryClient();
 
-  const { data: expenses = [], isLoading } = useQuery<ExpenseType[]>({
-    queryKey: ['expenses', envelopeId],
-    queryFn: () => getExpensesByEnvelopeId(envelopeId),
-  });
-
-  const { mutate: createExpenseMutation, isPending: isCreating } = useMutation({
-    mutationFn: (expense: CreateExpenseDto) => createExpense(envelopeId, expense),
+  const { mutate: addExpenseMutation, isPending: isCreating } = useMutation({
+    mutationFn: async (expenseData: CreateExpenseDto) => {
+      // In a real app, this would be an API call to the backend
+      const response = await fetch(`/api/envelopes/${envelope.id}/expenses`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(expenseData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add expense');
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       message.success('Expense added successfully');
       form.resetFields();
       setIsAddExpenseModalVisible(false);
-      queryClient.invalidateQueries({ queryKey: ['expenses', envelopeId] });
+      queryClient.invalidateQueries({ queryKey: ['envelopes'] });
     },
     onError: () => {
       message.error('Failed to add expense');
@@ -85,7 +93,7 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
 
   const handleAddExpense = () => {
     form.validateFields().then((values: CreateExpenseDto) => {
-      createExpenseMutation(values);
+      addExpenseMutation(values);
     });
   };
 
@@ -100,11 +108,12 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
     }
   }, [isAddExpenseModalVisible]);
 
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalExpenses = envelope.expenses?.reduce((sum, expense) => 
+    expense.transactionType === 'WITHDRAW' ? sum - expense.amount : sum + expense.amount, 0) || 0;
 
   return (
     <Modal
-      title={`Expenses for ${envelopeName}`}
+      title={`Expenses for ${envelope.name}`}
       open={true}
       onCancel={onClose}
       footer={null}
@@ -128,12 +137,12 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
         </Space>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={expenses}
+      <Table 
+        columns={columns} 
+        dataSource={envelope.expenses || []} 
         rowKey="id"
-        loading={isLoading}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
+        style={{ marginTop: 16 }}
       />
 
       <Modal
