@@ -1,12 +1,13 @@
-import { Table, Space, Button, Modal, message, Typography } from 'antd';
+import { Table, Space, Button, Modal, message, Typography, Tooltip } from 'antd';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { Envelope } from '../../api/getEnvelopes';
 import getEnvelopes from '../../api/getEnvelopes';
 import deleteEnvelope from '../../api/deleteEnvelope';
-import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined, DollarOutlined } from '@ant-design/icons';
 import EditEnvelopeForm from '../EditEnvelopeForm/EditEnvelopeForm';
 import CreateEnvelopeForm from '../CreateEnvelopeForm/CreateEnvelopeForm';
+import EnvelopeExpenses from '../EnvelopeExpenses/EnvelopeExpenses';
 import './EnvelopesTable.css';
 
 const { confirm } = Modal;
@@ -25,9 +26,11 @@ const columns = [
   },
 ];
 
+
 export default function EnvelopesTable() {
   const queryClient = useQueryClient();
   const [editingEnvelope, setEditingEnvelope] = useState<Envelope | null>(null);
+  const [viewingExpensesForEnvelope, setViewingExpensesForEnvelope] = useState<Envelope | null>(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
   const {data: envelopes = [], isLoading, isError} = useQuery<Envelope[]>({
@@ -70,49 +73,62 @@ export default function EnvelopesTable() {
     return <div>Error loading envelopes</div>;
   }
 
+  const actionColumn = {
+    title: 'Actions',
+    key: 'actions',
+    width: 200,
+    render: (_: any, record: Envelope) => (
+      <Space size="middle">
+        <Tooltip title="View Expenses">
+          <Button
+            type="text"
+            icon={<DollarOutlined />}
+            onClick={() => setViewingExpensesForEnvelope(record)}
+            aria-label="View Expenses"
+          />
+        </Tooltip>
+        <Tooltip title="Edit Envelope">
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => setEditingEnvelope(record)}
+            aria-label="Edit"
+          />
+        </Tooltip>
+        <Tooltip title="Delete Envelope">
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            aria-label="Delete"
+            loading={isDeleting}
+            disabled={isDeleting}
+          />
+        </Tooltip>
+      </Space>
+    ),
+  };
+
   return (
     <div className="envelopes-container">
       <div className="envelopes-header">
         <Typography.Title level={4} className="envelopes-title">Envelopes</Typography.Title>
         <div className="envelopes-actions">
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setIsCreateModalVisible(true)}
-            aria-label="New Envelope"
-          />
+          <Tooltip title="New Envelope">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setIsCreateModalVisible(true)}
+              aria-label="New Envelope"
+            />
+          </Tooltip>
         </div>
       </div>
       
       <div className="envelopes-table-wrapper">
         <Table
-          columns={[
-            ...columns,
-            {
-              title: 'Actions',
-              key: 'actions',
-              width: 120,
-              render: (_, record) => (
-                <Space size="middle">
-                  <Button
-                    type="text"
-                    icon={<EditOutlined />}
-                    onClick={() => setEditingEnvelope(record)}
-                    aria-label="Edit"
-                  />
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleDelete(record.id)}
-                    aria-label="Delete"
-                    loading={isDeleting}
-                    disabled={isDeleting}
-                  />
-                </Space>
-              ),
-            },
-          ]}
+          columns={[...columns, actionColumn]}
           dataSource={envelopes}
           loading={isLoading}
           rowKey="id"
@@ -120,6 +136,14 @@ export default function EnvelopesTable() {
           className="envelopes-table"
         />
       </div>
+
+      {viewingExpensesForEnvelope && (
+        <EnvelopeExpenses
+          envelopeId={viewingExpensesForEnvelope.id}
+          envelopeName={viewingExpensesForEnvelope.name}
+          onClose={() => setViewingExpensesForEnvelope(null)}
+        />
+      )}
 
       <Modal
         title="Create New Envelope"
