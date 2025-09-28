@@ -7,7 +7,7 @@ import deleteEnvelope from '../../api/deleteEnvelope';
 import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined, DollarOutlined } from '@ant-design/icons';
 import EditEnvelopeForm from '../EditEnvelopeForm/EditEnvelopeForm';
 import CreateEnvelopeForm from '../CreateEnvelopeForm/CreateEnvelopeForm';
-import EnvelopeExpenses from '../EnvelopeExpenses/EnvelopeExpenses';
+import Expenses from '../Expenses/Expenses';
 import './EnvelopesTable.css';
 
 const { confirm } = Modal;
@@ -138,7 +138,7 @@ export default function EnvelopesTable() {
       </div>
 
       {viewingExpensesForEnvelope && (
-        <EnvelopeExpenses
+        <Expenses
           envelopeId={viewingExpensesForEnvelope.id}
           envelopeName={viewingExpensesForEnvelope.name}
           onClose={() => setViewingExpensesForEnvelope(null)}

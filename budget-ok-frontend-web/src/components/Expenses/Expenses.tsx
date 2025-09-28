@@ -1,22 +1,23 @@
 import { Table, Modal, Button, Space, Typography, Form, Input, InputNumber, message, Radio, Tooltip } from 'antd';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import type { TransactionType } from '../../api/expense';
-import type { Expense, CreateExpenseDto } from '../../api/expense';
+import type { Expense as ExpenseType, CreateExpenseDto } from '../../api/expense';
 import { getExpensesByEnvelopeId, createExpense } from '../../api/expense';
 
 const { Title, Text } = Typography;
 
-interface EnvelopeExpensesProps {
+interface ExpensesProps {
   envelopeId: string;
   envelopeName: string;
   onClose: () => void;
 }
 
-export default function EnvelopeExpenses({ envelopeId, envelopeName, onClose }: EnvelopeExpensesProps) {
+export default function Expenses({ envelopeId, envelopeName, onClose }: ExpensesProps) {
   const [form] = Form.useForm<{ amount: number; memo: string; description?: string; transactionType: TransactionType }>();
   const [isAddExpenseModalVisible, setIsAddExpenseModalVisible] = useState(false);
+  const amountInputRef = useRef<any>(null);
   
   // Set default form values
   useEffect(() => {
@@ -26,7 +27,7 @@ export default function EnvelopeExpenses({ envelopeId, envelopeName, onClose }: 
   }, [form]);
   const queryClient = useQueryClient();
 
-  const { data: expenses = [], isLoading } = useQuery<Expense[]>({
+  const { data: expenses = [], isLoading } = useQuery<ExpenseType[]>({
     queryKey: ['expenses', envelopeId],
     queryFn: () => getExpensesByEnvelopeId(envelopeId),
   });
@@ -55,7 +56,7 @@ export default function EnvelopeExpenses({ envelopeId, envelopeName, onClose }: 
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
-      render: (amount: number, record: Expense) => (
+      render: (amount: number, record: ExpenseType) => (
         <span style={{ color: record.transactionType === 'WITHDRAW' ? '#ff4d4f' : '#52c41a' }}>
           {record.transactionType === 'WITHDRAW' ? '-' : '+'}${amount.toFixed(2)}
         </span>
@@ -86,6 +87,17 @@ export default function EnvelopeExpenses({ envelopeId, envelopeName, onClose }: 
       createExpenseMutation(values);
     });
   };
+
+  // Focus amount input when modal opens
+  useEffect(() => {
+    if (isAddExpenseModalVisible && amountInputRef.current) {
+      // Small timeout to ensure the modal is fully rendered
+      const timer = setTimeout(() => {
+        amountInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAddExpenseModalVisible]);
 
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
@@ -150,6 +162,8 @@ export default function EnvelopeExpenses({ envelopeId, envelopeName, onClose }: 
               step={0.01}
               precision={2}
               prefix="$"
+              ref={amountInputRef}
+              autoFocus
             />
           </Form.Item>
           <Form.Item
