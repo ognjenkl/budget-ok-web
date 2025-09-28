@@ -1,4 +1,5 @@
 import { Table, Modal, Button, Space, Typography, Form, Input, InputNumber, message, Radio, Tooltip } from 'antd';
+import './Expenses.css';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
@@ -57,7 +58,7 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
       dataIndex: 'amount',
       key: 'amount',
       render: (amount: number, record: ExpenseType) => (
-        <span style={{ color: record.transactionType === 'WITHDRAW' ? '#ff4d4f' : '#52c41a' }}>
+        <span className={record.transactionType === 'WITHDRAW' ? 'amount-withdraw' : 'amount-deposit'}>
           {record.transactionType === 'WITHDRAW' ? '-' : '+'}${amount.toFixed(2)}
         </span>
       ),
@@ -109,22 +110,17 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
       footer={null}
       width={800}
     >
-      <div style={{ marginBottom: 16 }}>
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={5} style={{ margin: 0 }}>Expense History</Title>
+      <div className="expenses-container">
+        <Space direction="vertical" className="expenses-space-container">
+          <div className="expenses-header">
+            <Title level={5} className="expenses-title">Expense History</Title>
             <Tooltip title="Add Expense">
               <Button
                 type="primary"
-                icon={<PlusOutlined style={{ fontSize: '18px' }} />}
+                icon={<PlusOutlined />}
                 onClick={() => setIsAddExpenseModalVisible(true)}
-                style={{
-                  width: '48px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
+                aria-label="Add Expense"
+                className="add-expense-button"
               />
             </Tooltip>
           </div>
@@ -157,7 +153,7 @@ export default function Expenses({ envelopeId, envelopeName, onClose }: Expenses
             rules={[{ required: true, message: 'Please enter the amount' }]}
           >
             <InputNumber
-              style={{ width: '100%' }}
+              className="amount-input"
               min={0.01}
               step={0.01}
               precision={2}
