@@ -1,12 +1,24 @@
-import { Table, Modal, Button, Space, Typography, Form, Input, InputNumber, message, Radio, Tooltip } from 'antd';
+import { Button, Space, Typography, Form, Input, InputNumber as AntdInputNumber, message, Radio, Tooltip, Modal, Table } from 'antd';
 import './Expenses.css';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import type { TransactionType, Expense as ExpenseType, CreateExpenseDto, Envelope } from '../../api/getEnvelopes';
-// Expense creation is now handled by the Envelope class
+import type { TransactionType, Envelope } from '../../api/getEnvelopes';
 
-const { Title, Text } = Typography;
+import createExpense from '../../api/createExpense';
+import type { CreateExpenseDto } from '../../api/createExpense.dto';
+import type { CreateExpenseResponse } from '../../api/createExpense.response';
+
+const { Text, Title } = Typography;
+
+interface ExpenseType {
+  id: string;
+  amount: number;
+  memo: string;
+  description?: string;
+  date: string;
+  transactionType: TransactionType;
+}
 
 interface ExpensesProps {
   envelope: Envelope;
@@ -14,9 +26,13 @@ interface ExpensesProps {
 }
 
 export default function Expenses({ envelope, onClose }: ExpensesProps) {
-  const [form] = Form.useForm<{ amount: number; memo: string; description?: string; transactionType: TransactionType }>();
-  const [isAddExpenseModalVisible, setIsAddExpenseModalVisible] = useState(false);
-  const amountInputRef = useRef<any>(null);
+  const [form] = Form.useForm<CreateExpenseDto>();
+  // Modal visibility state
+  const [modalState, setModalState] = useState({
+    isAddExpenseModalVisible: false
+  });
+  const { isAddExpenseModalVisible } = modalState;
+  const amountInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   
   // Set default form values
@@ -26,31 +42,20 @@ export default function Expenses({ envelope, onClose }: ExpensesProps) {
     });
   }, [form]);
 
-  const { mutate: addExpenseMutation, isPending: isCreating } = useMutation({
-    mutationFn: async (expenseData: CreateExpenseDto) => {
-      // In a real app, this would be an API call to the backend
-      const response = await fetch(`/api/envelopes/${envelope.id}/expenses`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(expenseData),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to add expense');
-      }
-      
-      return response.json();
-    },
+  const { mutate: addExpenseMutation, isPending: isCreating } = useMutation<CreateExpenseResponse, Error, CreateExpenseDto>({
+    mutationFn: (expenseData: CreateExpenseDto) => createExpense(envelope.id, {
+      ...expenseData,
+      amount: expenseData.amount * (expenseData.transactionType === 'WITHDRAW' ? -1 : 1)
+    }),
     onSuccess: () => {
       message.success('Expense added successfully');
       form.resetFields();
-      setIsAddExpenseModalVisible(false);
+      setModalState(prev => ({ ...prev, isAddExpenseModalVisible: false }));
       queryClient.invalidateQueries({ queryKey: ['envelopes'] });
     },
-    onError: () => {
-      message.error('Failed to add expense');
+    onError: (error) => {
+      const errorMessage = error?.message || 'Failed to add expense';
+      message.error(errorMessage);
     },
   });
 
@@ -91,10 +96,16 @@ export default function Expenses({ envelope, onClose }: ExpensesProps) {
     },
   ];
 
-  const handleAddExpense = () => {
-    form.validateFields().then((values: CreateExpenseDto) => {
-      addExpenseMutation(values);
-    });
+  const handleAddExpense = async () => {
+    try {
+      const values = await form.validateFields();
+      addExpenseMutation({
+        ...values,
+        amount: Math.abs(values.amount) // Ensure amount is positive
+      });
+    } catch (error) {
+      console.error('Form validation failed:', error);
+    }
   };
 
   // Focus amount input when modal opens
@@ -127,7 +138,7 @@ export default function Expenses({ envelope, onClose }: ExpensesProps) {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={() => setIsAddExpenseModalVisible(true)}
+                onClick={() => setModalState(prev => ({ ...prev, isAddExpenseModalVisible: true }))}
                 aria-label="Add Expense"
                 className="add-expense-button"
               />
@@ -149,10 +160,11 @@ export default function Expenses({ envelope, onClose }: ExpensesProps) {
         title="Add New Expense"
         open={isAddExpenseModalVisible}
         onCancel={() => {
-          setIsAddExpenseModalVisible(false);
+          setModalState(prev => ({ ...prev, isAddExpenseModalVisible: false }));
           form.resetFields();
         }}
         onOk={handleAddExpense}
+        okButtonProps={{ loading: isCreating }}
         confirmLoading={isCreating}
       >
         <Form form={form} layout="vertical">
@@ -161,13 +173,13 @@ export default function Expenses({ envelope, onClose }: ExpensesProps) {
             label="Amount"
             rules={[{ required: true, message: 'Please enter the amount' }]}
           >
-            <InputNumber
+            <AntdInputNumber
+              ref={amountInputRef}
               className="amount-input"
               min={0.01}
               step={0.01}
               precision={2}
               prefix="$"
-              ref={amountInputRef}
               autoFocus
             />
           </Form.Item>

@@ -3,13 +3,6 @@ import buildApiPrefix from './buildApiPrefix';
 
 export type TransactionType = 'WITHDRAW' | 'DEPOSIT';
 
-export interface CreateExpenseDto {
-  amount: number;
-  memo: string;
-  description?: string;
-  transactionType: TransactionType;
-}
-
 export interface Expense {
   id: string;
   amount: number;
