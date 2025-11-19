@@ -1,0 +1,13 @@
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+dist/
+
+# Environment
+.env
+.env.local
