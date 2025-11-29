@@ -44,3 +44,12 @@ frontend/
 ## Development Notes
 - The project recently moved from `budget-ok-frontend-web` to `frontend` directory
 - Uses envelope-based budgeting model where expenses are tracked within envelopes
+
+## Git Guidelines
+See [GIT_GUIDELINES.md](./.claude/GIT_GUIDELINES.md) for detailed commit standards.
+
+**Summary:**
+- Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>(<scope>): <description>`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
+- Always request permission before committing
+- Verify tests pass and follow project conventions before committing
